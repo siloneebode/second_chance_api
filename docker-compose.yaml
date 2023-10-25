@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+
+  web:
+    restart: unless-stopped
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    # env_file is used to manage the env variables of our project
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  #  celery_worker:
+  #    restart: unless-stopped
+  #    build: .
+  #    command: celery -A second_chance_api worker
+  #    env_file:
+  #      - .env
+  #    volumes:
+  #      - .:/app
+  #    depends_on:
+  #      - redis
+  #      - db
+
+  #  celery_beat:
+  #    restart: unless-stopped
+  #    build: .
+  #    command: celery -A second_chance_api beat -l INFO
+  #    volumes:
+  #      - .:/app
+  #    depends_on:
+  #      - redis
+  #      - db
+
+  #  celery_flower:
+  #    restart: unless-stopped
+  #    build: .
+  #    command: celery -A second_chance_api --broker="${CELERY_BROKER}" flower
+  #    volumes:
+  #      - .:/app
+  #    ports:
+  #      - "5557:5555"
+  #    depends_on:
+  #      - redis
+  #      - db
+  #      - celery_worker
+
+  adminer:
+    restart: unless-stopped
+    image: adminer
+    environment:
+      APP_ENV: dev
+      ADMINER_DESIGN: pepa-linha
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "8888:8080"
+
+  mail:
+    restart: unless-stopped
+    image: mailhog/mailhog
+    ports:
+      - "1080:8025"
+
+volumes:
+  postgres_data:

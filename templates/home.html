@@ -1,0 +1,26 @@
+<!DOCTYPE>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>
+        Bonjour
+    </title>
+</head>
+    <body>
+        <h1 class="app"></h1>
+    </body>
+
+<script>
+    console.log(window.location.host)
+    const websocket = new WebSocket("ws://" + window.location.host  + "/notifications/")
+
+    websocket.onmessage = (e) => {
+        const data = JSON.parse(e.data)
+        console.log(data)
+        document.querySelector('.app').innerText = data['message']
+    }
+</script>
+</html>
+
+
